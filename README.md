@@ -1,14 +1,42 @@
-# trumpet
+# overtone.inst.trumpet
 
-A Clojure library designed to ... well, that part is up to you.
+Trumpet samples from freesound.org
 
 ## Usage
 
-FIXME
+In project.clj,
+
+    [overtone-trumpet "0.1.0"]
+
+Require overtone first, as the sample loading process needs to be connected to a
+supercollider server
+
+```clojure
+(require '[overtone.live :refer :all]
+          [overtone.inst.trumpet :refer [sampled-trumpet]])
+
+(sampled-trumpet) ;; plays middle c on trumpet
+
+(sampled-trumpet :pitch 63 :attack 0.05 :level 1.5 :start-pos 0.1) ;; plays a different note
+```
+
+To control the duration of a note, use the `:gate` argument. For example,
+
+```clojure
+(defmacro play-gated [duration & body]
+  `(let [duration-ms# (* 1000 ~duration)
+         inst-result# ~@body]
+     (at (+ (now) duration-ms#)
+         (ctl inst-result# :gate 0))))
+
+;; An A minor chord for a quarter note at 130 bpm
+(doseq [midi-note [57 60 64]]
+  (play-gated 0.46 (sampled-trumpet :pitch midi-note)))
+```
 
 ## License
 
-Copyright © 2019 FIXME
+Copyright © 2019 Karl Thorssen
 
 This program and the accompanying materials are made available under the
 terms of the Eclipse Public License 2.0 which is available at
